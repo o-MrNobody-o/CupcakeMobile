@@ -5,9 +5,7 @@ plugins {
 
 android {
     namespace = "com.isetr.cupcake"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.isetr.cupcake"
@@ -34,6 +32,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+    }
+    buildFeatures {
+        dataBinding = true
     }
 }
 
