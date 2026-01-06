@@ -1,8 +1,6 @@
 package com.isetr.cupcake.data.local
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface UserDao {
@@ -18,4 +16,20 @@ interface UserDao {
     // Check if email exists (for registration)
     @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
     suspend fun getUserByEmail(email: String): UserEntity?
+
+    // -----------------------
+    // Account page support
+    // -----------------------
+
+    // Get the last inserted user (current user session)
+    @Query("SELECT * FROM users ORDER BY id DESC LIMIT 1")
+    suspend fun getLastUser(): UserEntity?
+
+    // Update user info
+    @Update
+    suspend fun updateUser(user: UserEntity)
+
+    // Delete user
+    @Delete
+    suspend fun deleteUser(user: UserEntity)
 }

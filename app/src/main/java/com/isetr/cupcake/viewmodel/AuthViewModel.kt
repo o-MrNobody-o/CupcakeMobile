@@ -1,19 +1,18 @@
 package com.isetr.cupcake.viewmodel
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.isetr.cupcake.data.local.UserEntity
+import androidx.lifecycle.*
 import com.isetr.cupcake.data.repository.AuthRepository
+import com.isetr.cupcake.data.local.UserEntity
 import kotlinx.coroutines.launch
 
 class AuthViewModel(context: Context) : ViewModel() {
 
     private val repository = AuthRepository(context)
 
+    // -----------------------
     // LiveData for UI updates
+    // -----------------------
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
 
@@ -26,8 +25,9 @@ class AuthViewModel(context: Context) : ViewModel() {
     private val _currentUser = MutableLiveData<UserEntity?>()
     val currentUser: LiveData<UserEntity?> = _currentUser
 
-
+    // -----------------------
     // Login
+    // -----------------------
     fun onLoginClicked(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
             _error.value = "Please enter email and password"
@@ -37,9 +37,29 @@ class AuthViewModel(context: Context) : ViewModel() {
         _loading.value = true
         viewModelScope.launch {
             try {
-                val user = repository.loginUser(email, password)
+                // ----------- Room login -----------
+                var user: UserEntity? = repository.loginUser(email, password)
+
+                // ----------- Firebase login -----------
+                /*
+                if (user == null) {
+                    val firebaseData = repository.loginUserFirebase(email, password)
+                    if (firebaseData != null) {
+                        user = UserEntity(
+                            nom = firebaseData["nom"] ?: "",
+                            prenom = firebaseData["prenom"] ?: "",
+                            email = firebaseData["email"] ?: "",
+                            adresse = firebaseData["adresse"] ?: "",
+                            telephone = firebaseData["telephone"] ?: "",
+                            password = password
+                        )
+                        // Save to local Room as cache
+                        repository.registerUser(user)
+                    }
+                }
+                */
                 if (user != null) {
-                    _currentUser.value = user   //  save current user
+                    _currentUser.value = user
                     _success.value = true
                 } else {
                     _error.value = "Invalid email or password"
@@ -52,7 +72,9 @@ class AuthViewModel(context: Context) : ViewModel() {
         }
     }
 
+    // -----------------------
     // Register
+    // -----------------------
     fun onRegisterClicked(
         nom: String,
         prenom: String,
@@ -62,7 +84,6 @@ class AuthViewModel(context: Context) : ViewModel() {
         password: String,
         confirmPassword: String
     ) {
-        // Validation
         if (nom.isBlank() || prenom.isBlank() || email.isBlank() ||
             adresse.isBlank() || telephone.isBlank() || password.isBlank() || confirmPassword.isBlank()
         ) {
@@ -83,29 +104,22 @@ class AuthViewModel(context: Context) : ViewModel() {
         _loading.value = true
         viewModelScope.launch {
             try {
-                val success = repository.registerUser(
-                    UserEntity(
-                        nom = nom,
-                        prenom = prenom,
-                        email = email,
-                        adresse = adresse,
-                        telephone = telephone,
-                        password = password
-                    )
+                // ----------- Firebase registration -----------
+                //repository.registerUserFirebase(nom, prenom, email, adresse, telephone, password)
+
+                // ----------- Room registration (local cache) -----------
+                val user = UserEntity(
+                    nom = nom,
+                    prenom = prenom,
+                    email = email,
+                    adresse = adresse,
+                    telephone = telephone,
+                    password = password
                 )
-                if (success) {
-                    _currentUser.value = UserEntity(
-                        nom = nom,
-                        prenom = prenom,
-                        email = email,
-                        adresse = adresse,
-                        telephone = telephone,
-                        password = password
-                    )
-                    _success.value = true
-                } else {
-                    _error.value = "Email already exists"
-                }
+                repository.registerUser(user)
+
+                _currentUser.value = user
+                _success.value = true
             } catch (e: Exception) {
                 _error.value = e.message
             } finally {

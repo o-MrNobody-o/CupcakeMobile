@@ -9,20 +9,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.isetr.cupcake.R
-import com.isetr.cupcake.databinding.ActivityMainBinding
+import com.isetr.cupcake.databinding.ActivityAuthBinding
+import com.isetr.cupcake.ui.WelcomeActivity
 import com.isetr.cupcake.viewmodel.AuthViewModel
 import com.isetr.cupcake.viewmodel.AuthViewModelFactory
 
-class MainActivity : AppCompatActivity() {
+class AuthActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityAuthBinding
     private lateinit var viewModel: AuthViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Setup DataBinding
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_auth)
 
         // Setup ViewModel
         viewModel = ViewModelProvider(
@@ -34,9 +35,7 @@ class MainActivity : AppCompatActivity() {
         // Observe ViewModel LiveData
         observeViewModel()
 
-        // -----------------------
         // Navigation: Login <-> Register
-        // -----------------------
         binding.tvGoRegister.setOnClickListener {
             binding.layoutLogin.animate().alpha(0f).setDuration(300).withEndAction {
                 binding.layoutLogin.visibility = View.GONE
@@ -55,9 +54,7 @@ class MainActivity : AppCompatActivity() {
             }.start()
         }
 
-        // -----------------------
         // Show / hide password
-        // -----------------------
         binding.cbShowPassword.setOnCheckedChangeListener { _, isChecked ->
             val type = if (isChecked)
                 InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
@@ -71,18 +68,14 @@ class MainActivity : AppCompatActivity() {
             binding.etRegConfirmPassword.setSelection(binding.etRegConfirmPassword.text.length)
         }
 
-        // -----------------------
         // Login button
-        // -----------------------
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString()
             val password = binding.etPassword.text.toString()
             viewModel.onLoginClicked(email, password)
         }
 
-        // -----------------------
         // Register button
-        // -----------------------
         binding.btnRegister.setOnClickListener {
             val nom = binding.etRegNom.text.toString()
             val prenom = binding.etRegPrenom.text.toString()
@@ -104,9 +97,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // -----------------------
     // LiveData Observers
-    // -----------------------
     private fun observeViewModel() {
         // Show loading (optional: you can add a ProgressBar later)
         viewModel.loading.observe(this) { isLoading ->
@@ -136,7 +127,5 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
-
     }
 }

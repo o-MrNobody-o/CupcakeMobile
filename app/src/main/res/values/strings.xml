@@ -14,4 +14,10 @@
     <string name="telephone">Téléphone</string>
     <string name="confirm_password">Confirmer le mot de passe</string>
     <string name="show_password">Voir le mot de passe</string>
+    <string name="moncompte">Mon Compte</string>
+    <string name="updateProfile">mettre a jour</string>
+    <string name="deleteProfile">supprimer compte</string>
+    <string name="logout">Logout</string>
+    <string name="pastryProdcut">Nos produits</string>
+    <string name="votreCompte">Votre compte</string>
 </resources>

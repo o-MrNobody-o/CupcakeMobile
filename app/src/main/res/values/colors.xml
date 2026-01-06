@@ -2,4 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="cupcake_pink">#FE828C</color>
+    <color name="cupcake_pink_dark">#E86B75</color>
+    <color name="rose_poudre">#F7D6DA</color>
+
 </resources>
