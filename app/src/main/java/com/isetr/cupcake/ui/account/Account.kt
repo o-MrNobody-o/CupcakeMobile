@@ -2,7 +2,10 @@ package com.isetr.cupcake.ui.account
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
+import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -58,12 +61,7 @@ class AccountActivity : AppCompatActivity() {
         }
 
         binding.btnDeleteAccount.setOnClickListener {
-            viewModel.deleteAccount {
-                val intent = Intent(this, AuthActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-                finish()
-            }
+            showDeleteConfirmationDialog()
         }
 
         binding.btnLogout.setOnClickListener {
@@ -73,5 +71,34 @@ class AccountActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+    }
+
+    private fun showDeleteConfirmationDialog() {
+        val passwordInput = EditText(this)
+        passwordInput.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        passwordInput.hint = getString(R.string.password)
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Confirm Deletion")
+            .setMessage("Please enter your password to confirm account deletion.")
+            .setView(passwordInput)
+            .setPositiveButton("Delete") { _, _ ->
+                val enteredPassword = passwordInput.text.toString()
+                val currentUser = viewModel.currentUser.value
+                if (currentUser != null && currentUser.password == enteredPassword) {
+                    viewModel.deleteAccount {
+                        val intent = Intent(this, AuthActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    }
+                } else {
+                    Toast.makeText(this, "Incorrect password", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
     }
 }
